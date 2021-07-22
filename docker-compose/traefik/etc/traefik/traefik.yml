@@ -1,0 +1,21 @@
+api:
+  dashboard: true
+
+providers:
+  docker:
+    exposedByDefault: false
+  file:
+    directory: '/etc/traefik/'
+
+entryPoints:
+  web:
+    address: ':80'
+  websecure:
+    address: ':443'
+
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/certs/wordpress.test.crt
+        keyFile: /etc/certs/wordpress.test.key

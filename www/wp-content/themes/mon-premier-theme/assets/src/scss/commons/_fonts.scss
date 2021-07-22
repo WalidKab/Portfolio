@@ -1,0 +1,33 @@
+.hero-banner{
+  background-color: wheat;
+  text-align: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+p{
+  color: $bleu-roi;
+}
+
+h2{
+  color: $bleu-roi;
+}
+
+a{
+  transition: all 0.2s ease-out;
+  text-decoration: none;
+  &:hover{
+    color: #bda273!important;
+  }
+}
+
+.h1-list{
+  color: wheat;
+  background-color: $bleu-roi;
+  text-align: center;
+  padding-top: 3rem;
+  padding-bottom: 2rem;
+  margin-bottom: 0;
+}

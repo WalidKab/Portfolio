@@ -1,0 +1,33 @@
+.navbar{
+  background-color: $bleu-roi;
+  padding: 5rem 5rem 5rem 5rem;
+}
+
+ul{
+  padding-inline-start: 0!important;
+}
+
+.menu{
+  display: inline-flex;
+}
+
+.navbar-nav{
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.nav-link{
+  color: wheat;
+  font-size: 2rem;
+  display: flex;
+  justify-content: space-around;
+}
+
+.menu-item{
+  list-style: none;
+}
+
+.navbar-expand-lg .navbar-nav .nav-link {
+  padding-right: 2rem;
+  padding-left: 2rem;
+}

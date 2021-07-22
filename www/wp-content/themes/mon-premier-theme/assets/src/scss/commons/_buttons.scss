@@ -1,0 +1,14 @@
+.wpcf7-submit{
+  background-color: $bleu-roi;
+  color: wheat;
+  padding: 1rem 2rem 1rem 2rem;
+  margin-left: 10rem;
+  margin-top: 2rem;
+  transition: all 0.1s ease-out;
+
+    &:hover{
+      background-color: #0a53be;
+      color: white;
+      box-shadow: 2px 2px 30px 2px $bleu-roi;
+    }
+}

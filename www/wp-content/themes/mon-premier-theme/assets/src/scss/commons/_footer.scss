@@ -1,0 +1,51 @@
+.footer-menu{
+  padding: 2rem 2rem 2rem 2rem;
+
+  .menu{
+    display: inline-flex;
+  }
+
+  .nav-link{
+    color: wheat;
+    font-size: 1rem;
+  }
+
+  .navbar-nav{
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.menu-menu-footer-container{
+  margin-left: auto;
+  margin-right: auto;
+}
+
+ion-icon{
+  color: wheat;
+  width: 3rem;
+  height: 3rem;
+  margin-top: 2rem;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.icon-footer{
+  display: inline-flex;
+}
+
+.social-icon{
+  margin-left: 5rem;
+}
+
+.menu-menu-footer{
+  a{
+    margin-left: 5rem;
+  }
+}
+
+.widgettitle{
+  color: wheat;
+  text-align: center;
+  margin-top: 2rem;
+}

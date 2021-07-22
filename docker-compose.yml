@@ -1,0 +1,143 @@
+version: "3.7"
+services:
+  php:
+    build:
+      context: ./
+      dockerfile: ./docker-compose/php/Dockerfile
+    image: wordpress
+    container_name: wordpress-php
+    restart: unless-stopped
+    working_dir: /var/www/
+    expose:
+      - 9000
+    volumes:
+      - ./www:/var/www
+      - ./docker-compose/php/php-ini-overrides.ini:/usr/local/etc/php/conf.d/99-overrides.ini
+    extra_hosts:
+      - "www.wordpress.test:172.28.1.254"
+    networks:
+      - wordpress
+
+  db:
+    image: library/mariadb:10.5.6
+    container_name: wordpress-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_PASSWORD: password
+      MYSQL_USER: root
+    expose:
+      - 3306
+    volumes:
+      - ./docker-compose/mysql/config:/etc/mysql/conf.d
+      - ./docker-compose/dbdata:/var/lib/mysql
+      - ./backups-sql:/home/root/
+    networks:
+      - wordpress
+
+  nginx:
+    image: nginx:alpine
+    container_name: wordpress-nginx
+    restart: unless-stopped
+    expose:
+      - 80
+    volumes:
+      - ./www:/var/www
+      - ./docker-compose/nginx:/etc/nginx/conf.d/
+    networks:
+      - wordpress
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.nginx.loadbalancer.server.port: '80'
+      traefik.http.routers.nginx.service: "nginx"
+      traefik.http.routers.nginx.entrypoints: 'web'
+      traefik.http.routers.nginx.rule: 'Host(`www.${DOMAIN}`) || Host(`${DOMAIN}`)'
+      traefik.http.routers.nginx.middlewares: 'redirect_https'
+      traefik.http.routers.https-nginx.service: "nginx"
+      traefik.http.routers.https-nginx.entrypoints: 'websecure'
+      traefik.http.routers.https-nginx.rule: 'Host(`www.${DOMAIN}`) || Host(`${DOMAIN}`)'
+      traefik.http.routers.https-nginx.middlewares: 'redirect_no_www'
+      traefik.http.routers.https-nginx.tls: true
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: wordpress-phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: unless-stopped
+    volumes:
+      - ./docker-compose/php/php-ini-overrides.ini:/usr/local/etc/php/conf.d/99-php-phpmyadmin.ini
+    expose:
+      - 80
+    networks:
+      - wordpress
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.phpmyadmin.loadbalancer.server.port: '80'
+      traefik.http.routers.phpmyadmin.service: "phpmyadmin"
+      traefik.http.routers.phpmyadmin.entrypoints: 'web'
+      traefik.http.routers.phpmyadmin.rule: 'Host(`phpmyadmin.${DOMAIN}`)'
+      traefik.http.routers.phpmyadmin.middlewares: 'redirect_https'
+      traefik.http.routers.https-phpmyadmin.service: "phpmyadmin"
+      traefik.http.routers.https-phpmyadmin.entrypoints: 'websecure'
+      traefik.http.routers.https-phpmyadmin.rule: 'Host(`phpmyadmin.${DOMAIN}`)'
+      traefik.http.routers.https-phpmyadmin.tls: true
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: wordpress-mailhog
+    ports:
+      - 1025
+      - 8025
+    networks:
+      - wordpress
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.mailhog.loadbalancer.server.port: '8025'
+      traefik.http.routers.mailhog.service: "mailhog"
+      traefik.http.routers.mailhog.entrypoints: 'web'
+      traefik.http.routers.mailhog.rule: 'Host(`mailhog.${DOMAIN}`)'
+      traefik.http.routers.mailhog.middlewares: 'redirect_https'
+      traefik.http.routers.https-mailhog.service: "mailhog"
+      traefik.http.routers.https-mailhog.entrypoints: 'websecure'
+      traefik.http.routers.https-mailhog.rule: 'Host(`mailhog.${DOMAIN}`)'
+      traefik.http.routers.https-mailhog.tls: true
+
+  traefik:
+    image: "traefik:v2.2"
+    container_name: "wordpress-traefik"
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - "./docker-compose/traefik/etc/traefik/:/etc/traefik/"
+      - "./docker-compose/traefik/etc/certs/:/etc/certs/"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      wordpress:
+        ipv4_address: 172.28.1.254
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.api.rule: "Host(`traefik.${DOMAIN}`)"
+      traefik.http.routers.api.entrypoints: "web"
+      traefik.http.routers.api.service: "api@internal"
+      traefik.http.routers.api.middlewares: 'redirect_https'
+      traefik.http.routers.https-api.service: "api@internal"
+      traefik.http.routers.https-api.entrypoints: 'websecure'
+      traefik.http.routers.https-api.rule: 'Host(`traefik.${DOMAIN}`)'
+      traefik.http.routers.https-api.tls: true
+      traefik.http.middlewares.redirect_https.redirectscheme.scheme: https
+      traefik.http.middlewares.redirect_https.redirectscheme.permanent: true
+      traefik.http.middlewares.redirect_no_www.redirectregex.regex: '^https://${DOMAIN}/(.*)'
+      traefik.http.middlewares.redirect_no_www.redirectregex.replacement: 'https://www.${DOMAIN}/$${1}'
+      traefik.http.middlewares.redirect_no_www.redirectregex.permanent: true
+
+networks:
+  wordpress:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.1.0/24
