@@ -2,17 +2,6 @@
   text-align: center;
 }
 
-.main-content-with-grid{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 0px 50px;
-  grid-template-areas:
-    ". ."
-    ". .";
-  text-align: center;
-}
-
 .p-content-left{
   grid-column-start: 1;
   padding-left: 10rem;

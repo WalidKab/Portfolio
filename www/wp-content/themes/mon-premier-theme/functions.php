@@ -63,6 +63,24 @@ function montheme_init(){
         'has_archive' => true,
         'rewrite' => ['slug' => 'mes-projets'],
     ]);
+    register_post_type('passions',[
+        'label' => 'Passions',
+        'public' => true,
+        'menu_position' => 5,
+        'menu_icon' => 'dashicons-welcome-write-blog',
+        'supports' => ['title', 'editor', 'thumbnail'],
+        'show_in_rest' => true,
+        'has_archive' => true,
+        'rewrite' => ['slug' => 'mes-passions'],
+    ]);
 }
 
 add_action('init', 'montheme_init');
+
+function wpc_theme_support() {
+    add_theme_support('custom-logo', array(
+        'flex-height' => true,
+        'flex-width'  => true,
+    ));
+}
+add_action('after_setup_theme','wpc_theme_support');
