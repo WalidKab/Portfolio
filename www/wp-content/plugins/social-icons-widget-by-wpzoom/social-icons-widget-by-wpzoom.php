@@ -5,7 +5,7 @@
  * Description: Social Icons Widget & Block to display links to social media networks websites. Supports most of the known social networks and includes more than 400 icons. Sort icons by Drag & Drop and change their color easily.
  * Author: WPZOOM
  * Author URI: https://www.wpzoom.com/
- * Version: 4.1.3
+ * Version: 4.2.0
  * License: GPLv2 or later
  * Text Domain: zoom-social-icons-widget
  * Domain Path: /languages
@@ -125,6 +125,15 @@ function zoom_social_icons_add_preload_to_rel_attribute( $tag, $handle, $href ) 
 function zoom_social_icons_widget_load_textdomain() {
 	load_plugin_textdomain( 'zoom-social-icons-widget', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
 }
+
+/**
+ * Hide old widget
+ */
+function zoom_social_icons_widget_hide( $widget_types ) {
+	$widget_types[] = 'zoom-social-icons-widget';
+	return $widget_types;
+}
+add_filter( 'widget_types_to_hide_from_legacy_widget_block', 'zoom_social_icons_widget_hide' );
 
 /**
  * Generate select values for block and widget options that are synced with fonts loading values from Settings Page.
